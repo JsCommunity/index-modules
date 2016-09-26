@@ -1,0 +1,60 @@
+{
+  "name": "index-modules",
+  "version": "0.0.0",
+  "license": "ISC",
+  "description": "Generate an index of all modules in a directory",
+  "keywords": [
+    "directory",
+    "folder",
+    "generate",
+    "generation",
+    "index",
+    "indexing",
+    "module",
+    "modules"
+  ],
+  "homepage": "https://github.com/JsCommunity/index-modules",
+  "bugs": "https://github.com/JsCommunity/index-modules/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JsCommunity/index-modules"
+  },
+  "author": {
+    "name": "Julien Fontanet",
+    "email": "julien.fontanet@isonoe.net"
+  },
+  "preferGlobal": false,
+  "files": [
+    "index.js"
+  ],
+  "bin": {
+    "index-modules": "index.js"
+  },
+  "engines": {
+    "node": ">=0.12"
+  },
+  "dependencies": {
+    "lodash": "^4.16.2",
+    "promise-toolbox": "^0.5.1"
+  },
+  "devDependencies": {
+    "dependency-check": "^2.5.1",
+    "ghooks": "^1.2.3",
+    "standard": "^8.1.0"
+  },
+  "scripts": {
+    "depcheck": "dependency-check ./package.json",
+    "lint": "standard",
+    "posttest": "npm run lint && npm run depcheck"
+  },
+  "standard": {
+    "ignore": [
+      "dist"
+    ]
+  },
+  "config": {
+    "ghooks": {
+      "commit-msg": "npm test"
+    }
+  }
+}
