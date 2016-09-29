@@ -40,7 +40,7 @@
   "devDependencies": {
     "dependency-check": "^2.5.1",
     "ghooks": "^1.2.3",
-    "standard": "^8.1.0"
+    "standard": "^8.3.0"
   },
   "scripts": {
     "depcheck": "dependency-check ./package.json",
