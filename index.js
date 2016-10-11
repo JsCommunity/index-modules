@@ -5,9 +5,9 @@ var promisify = require('promise-toolbox').promisify
 var camelCase = require('lodash/camelCase')
 var join = require('path').join
 var map = require('lodash/map')
-var readdir = promisify.call(require('fs').readdir)
-var stat = promisify.call(require('fs').stat)
-var writeFile = promisify.call(require('fs').writeFile)
+var readdir = promisify(require('fs').readdir)
+var stat = promisify(require('fs').stat)
+var writeFile = promisify(require('fs').writeFile)
 
 // ===================================================================
 
