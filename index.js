@@ -75,8 +75,8 @@ function indexModules (dir) {
 
         var identifier = camelCase(base)
         content.push(
-          'import ' + identifier + " from './" + base + "'",
-          'properties.' + identifier + ' = { enumerable: true, get: () => ' + identifier + ' }',
+          'import _' + identifier + " from './" + base + "'",
+          'properties.' + identifier + ' = { enumerable: true, get: () => _' + identifier + ' }',
           'export * as ' + identifier + " from './" + base + "'",
           ''
         )
