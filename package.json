@@ -34,7 +34,7 @@
     "node": ">=0.12"
   },
   "dependencies": {
-    "lodash": "^4.16.2",
+    "lodash": "^4.16.5",
     "promise-toolbox": "^0.7.0"
   },
   "devDependencies": {
