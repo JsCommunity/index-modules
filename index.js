@@ -77,7 +77,7 @@ function indexModules (dir) {
         content.push(
           'import _' + identifier + ', * as __' + identifier + " from './" + base + "'",
           'properties.' + identifier + ' = { enumerable: true, get: () => _' + identifier + ' }',
-          'export { __' + identifier + ' as ' + identifier + " } from './" + base + "'",
+          'export { __' + identifier + ' as ' + identifier + ' }',
           ''
         )
       }, function (error) {
