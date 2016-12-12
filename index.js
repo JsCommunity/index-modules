@@ -75,9 +75,9 @@ function indexModules (dir) {
 
         var identifier = camelCase(base)
         content.push(
-          'import _' + identifier + " from './" + base + "'",
+          'import _' + identifier + ', * as __' + identifier + " from './" + base + "'",
           'properties.' + identifier + ' = { enumerable: true, get: () => _' + identifier + ' }',
-          'export * as ' + identifier + " from './" + base + "'",
+          'export { __' + identifier + ' as ' + identifier + " } from './" + base + "'",
           ''
         )
       }, function (error) {
