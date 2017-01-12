@@ -28,6 +28,19 @@ index generated root/index.js
 index generated root/directory/index.js
 ```
 
+Using an index:
+
+```js
+import modules from './modules'
+
+modules.foo // default export of the foo module
+modules.bar // default export of the bar module
+
+import * as modules_ from './modules'
+
+modules_.foo.baz // baz export of the foo module
+```
+
 ## Contributions
 
 Contributions are *very* welcomed, either on the documentation or on
