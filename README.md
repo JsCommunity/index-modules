@@ -23,7 +23,7 @@ Generate indexes for all directory containing a `.index-modules`
 file:
 
 ```
-> index-modules root/
+> index-modules --auto root/
 index generated root/index.js
 index generated root/directory/index.js
 ```
