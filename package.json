@@ -39,10 +39,11 @@
   },
   "devDependencies": {
     "dependency-check": "^2.5.1",
-    "ghooks": "^1.2.3",
+    "husky": "^0.12.0",
     "standard": "^8.1.0"
   },
   "scripts": {
+    "commit-msg": "npm test",
     "depcheck": "dependency-check ./package.json",
     "lint": "standard",
     "posttest": "npm run lint && npm run depcheck"
@@ -51,10 +52,5 @@
     "ignore": [
       "dist"
     ]
-  },
-  "config": {
-    "ghooks": {
-      "commit-msg": "npm test"
-    }
   }
 }
