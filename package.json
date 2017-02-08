@@ -43,7 +43,7 @@
     "standard": "^8.6.0"
   },
   "scripts": {
-    "commit-msg": "npm test",
+    "commitmsg": "npm test",
     "posttest": "standard && dependency-check ./package.json"
   },
   "standard": {
