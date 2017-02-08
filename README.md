@@ -41,6 +41,15 @@ import * as modules_ from './modules'
 modules_.foo.baz // baz export of the foo module
 ```
 
+### Lazy index (CommonJS)
+
+> Only requires sub-modules when necessary.
+
+```
+> index-modules --cjs-lazy directory/
+index generated directory/index.js
+```
+
 ## Contributions
 
 Contributions are *very* welcomed, either on the documentation or on
