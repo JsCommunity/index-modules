@@ -131,6 +131,10 @@ function indexModules (dir) {
     var index = join(dir, 'index.js')
     return Promise.all(map(entries, function (entry) {
       return entry !== 'index.js' && stat(join(dir, entry)).then(function (stats) {
+        if (entry[0] === '.' || entry[0] === '_') {
+          return
+        }
+
         var base
         if (stats.isDirectory()) {
           base = entry
