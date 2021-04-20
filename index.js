@@ -108,7 +108,7 @@ const GENERATORS = (function () {
 
 let generator;
 
-const indexModules = asyncFn(function* (dir, importExt) {
+const indexModules = asyncFn(function* (dir, importExt, indexFile) {
   const formatPath =
     importExt === false
       ? (parts) => parts.name
@@ -119,12 +119,12 @@ const indexModules = asyncFn(function* (dir, importExt) {
   const content = generator.init();
 
   const entries = yield readdir(dir);
-  const index = join(dir, "index.js");
+  const index = join(dir, indexFile);
   try {
     yield Promise.all(
       entries.map(
         asyncFn(function* (entry) {
-          if (entry === "index.js" || entry[0] === "." || entry[0] === "_") {
+          if (entry === indexFile || entry[0] === "." || entry[0] === "_") {
             return;
           }
           try {
@@ -201,15 +201,19 @@ const findDirs = asyncFn(function* (dir, ...opts) {
 
   const opts = require("getopts")(args, {
     boolean: ["auto", "cjs-lazy"],
-    string: ["import-ext"],
+    default: {
+      "index-file": "index.js",
+    },
+    string: ["index-file", "import-ext"],
   });
 
   generator = opts["cjs-lazy"] ? GENERATORS.cjsLazy : GENERATORS.default;
 
   const importExt = opts["import-ext"];
+  const indexFile = opts["index-file"];
   if (opts.auto) {
-    findDirs(opts._[0], importExt);
+    findDirs(opts._[0], importExt, indexFile);
   } else {
-    Promise.all(opts._.map((dir) => indexModules(dir, importExt)));
+    Promise.all(opts._.map((dir) => indexModules(dir, importExt, indexFile)));
   }
 })(process.argv.slice(2));
