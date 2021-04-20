@@ -130,14 +130,11 @@ const indexModules = asyncFn(function* (dir) {
     yield Promise.all(
       entries.map(
         asyncFn(function* (entry) {
-          if (entry === "index.js") {
+          if (entry === "index.js" || entry[0] === "." || entry[0] === "_") {
             return;
           }
           try {
             const stats = yield stat(join(dir, entry));
-            if (entry[0] === "." || entry[0] === "_") {
-              return;
-            }
 
             let base;
             if (stats.isDirectory()) {
