@@ -4,7 +4,6 @@ const promisify = require("promise-toolbox").promisify;
 
 const camelCase = require("lodash/camelCase");
 const join = require("path").join;
-const map = require("lodash/map");
 const readdir = promisify(require("fs").readdir);
 const stat = promisify(require("fs").stat);
 const writeFile = promisify(require("fs").writeFile);
@@ -134,7 +133,7 @@ function indexModules(dir) {
   return readdir(dir).then(function (entries) {
     const index = join(dir, "index.js");
     return Promise.all(
-      map(entries, function (entry) {
+      entries.map(function (entry) {
         return (
           entry !== "index.js" &&
           stat(join(dir, entry)).then(
@@ -186,7 +185,7 @@ function findDirs(dir) {
   return readdir(dir).then(
     function (entries) {
       return Promise.all(
-        map(entries, function (entry) {
+        entries.map(function (entry) {
           const path = join(dir, entry);
           return stat(path).then(
             function (stats) {
@@ -233,6 +232,6 @@ function findDirs(dir) {
 
     findDirs(args[1]);
   } else {
-    Promise.all(map(args, indexModules));
+    Promise.all(args.map(indexModules));
   }
 })(process.argv.slice(2));
