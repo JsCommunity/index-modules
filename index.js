@@ -4,6 +4,7 @@ const { asyncFn, promisify } = require("promise-toolbox");
 
 const camelCase = require("lodash/camelCase");
 const join = require("path").join;
+const parse = require("path").parse;
 const readdir = promisify(require("fs").readdir);
 const stat = promisify(require("fs").stat);
 const writeFile = promisify(require("fs").writeFile);
@@ -23,20 +24,6 @@ function log() {
 
 function warn() {
   _log.apply(process.stderr, arguments);
-}
-
-// -------------------------------------------------------------------
-
-function removeSuffix(str, sfx) {
-  const strLength = str.length;
-  const sfxLength = sfx.length;
-
-  const pos = strLength - sfxLength;
-  if (pos < 0 || str.indexOf(sfx, pos) !== pos) {
-    return false;
-  }
-
-  return str.slice(0, pos);
 }
 
 // ===================================================================
@@ -121,7 +108,14 @@ const GENERATORS = (function () {
 
 let generator;
 
-const indexModules = asyncFn(function* (dir) {
+const indexModules = asyncFn(function* (dir, importExt) {
+  const formatPath =
+    importExt === false
+      ? (parts) => parts.name
+      : importExt === ""
+      ? (parts) => parts.name + parts.ext
+      : (parts) => parts.name + "." + importExt;
+
   const content = generator.init();
 
   const entries = yield readdir(dir);
@@ -135,21 +129,21 @@ const indexModules = asyncFn(function* (dir) {
           }
           try {
             const stats = yield stat(join(dir, entry));
-
-            let base;
+            let identifier, path, parts;
             if (stats.isDirectory()) {
-              base = entry;
+              identifier = path = entry;
+              path = entry;
             } else if (
-              !(
-                stats.isFile() &&
-                ((base = removeSuffix(entry, ".coffee")) ||
-                  (base = removeSuffix(entry, ".js")))
-              )
+              stats.isFile() &&
+              [".coffee", ".js"].includes((parts = parse(entry)).ext)
             ) {
+              identifier = parts.name;
+              path = formatPath(parts);
+            } else {
               return;
             }
 
-            generator.addModule(content, "./" + base, camelCase(base));
+            generator.addModule(content, "./" + path, camelCase(identifier));
           } catch (error) {
             warn("failed to read " + dir, error);
           }
@@ -169,7 +163,7 @@ const indexModules = asyncFn(function* (dir) {
   }
 });
 
-const findDirs = asyncFn(function* (dir) {
+const findDirs = asyncFn(function* (dir, ...opts) {
   try {
     const entries = yield readdir(dir);
     return Promise.all(
@@ -182,7 +176,7 @@ const findDirs = asyncFn(function* (dir) {
               return findDirs(path);
             }
             if (entry === ".index-modules" && stats.isFile()) {
-              return indexModules(dir);
+              return indexModules(dir, ...opts);
             }
           } catch (error) {
             warn("cannot read " + entry, error);
@@ -207,13 +201,15 @@ const findDirs = asyncFn(function* (dir) {
 
   const opts = require("getopts")(args, {
     boolean: ["auto", "cjs-lazy"],
+    string: ["import-ext"],
   });
 
   generator = opts["cjs-lazy"] ? GENERATORS.cjsLazy : GENERATORS.default;
 
+  const importExt = opts["import-ext"];
   if (opts.auto) {
-    findDirs(opts._[0]);
+    findDirs(opts._[0], importExt);
   } else {
-    Promise.all(opts._.map(indexModules));
+    Promise.all(opts._.map((dir) => indexModules(dir, importExt)));
   }
 })(process.argv.slice(2));
