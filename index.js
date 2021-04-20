@@ -135,7 +135,7 @@ const indexModules = asyncFn(function* (dir, importExt, indexFile) {
               path = entry;
             } else if (
               stats.isFile() &&
-              [".coffee", ".js"].includes((parts = parse(entry)).ext)
+              [".coffee", ".js", ".mjs"].includes((parts = parse(entry)).ext)
             ) {
               identifier = parts.name;
               path = formatPath(parts);
