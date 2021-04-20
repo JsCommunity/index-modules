@@ -25,12 +25,6 @@ function warn() {
   _log.apply(process.stderr, arguments);
 }
 
-function fatal() {
-  _log.apply(process.stderr, arguments);
-  // eslint-disable-next-line no-process-exit
-  process.exit(1);
-}
-
 // -------------------------------------------------------------------
 
 function removeSuffix(str, sfx) {
@@ -214,19 +208,15 @@ const findDirs = asyncFn(function* (dir) {
     );
   }
 
-  generator = GENERATORS.default;
-  if (args[0] === "--cjs-lazy") {
-    generator = GENERATORS.cjsLazy;
-    args.shift();
-  }
+  const opts = require("getopts")(args, {
+    boolean: ["auto", "cjs-lazy"],
+  });
 
-  if (args[0] === "--auto") {
-    if (args.length < 2) {
-      fatal("missing param <root dir>");
-    }
+  generator = opts["cjs-lazy"] ? GENERATORS.cjsLazy : GENERATORS.default;
 
-    findDirs(args[1]);
+  if (opts.auto) {
+    findDirs(opts._[0]);
   } else {
-    Promise.all(args.map(indexModules));
+    Promise.all(opts._.map(indexModules));
   }
 })(process.argv.slice(2));
