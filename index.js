@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const promisify = require("promise-toolbox").promisify;
+const { asyncFn, promisify } = require("promise-toolbox");
 
 const camelCase = require("lodash/camelCase");
 const join = require("path").join;
@@ -127,87 +127,82 @@ const GENERATORS = (function () {
 
 let generator;
 
-function indexModules(dir) {
+const indexModules = asyncFn(function* (dir) {
   const content = generator.init();
 
-  return readdir(dir).then(function (entries) {
-    const index = join(dir, "index.js");
-    return Promise.all(
-      entries.map(function (entry) {
-        return (
-          entry !== "index.js" &&
-          stat(join(dir, entry)).then(
-            function (stats) {
-              if (entry[0] === "." || entry[0] === "_") {
-                return;
-              }
-
-              let base;
-              if (stats.isDirectory()) {
-                base = entry;
-              } else if (
-                !(
-                  stats.isFile() &&
-                  ((base = removeSuffix(entry, ".coffee")) ||
-                    (base = removeSuffix(entry, ".js")))
-                )
-              ) {
-                return;
-              }
-
-              generator.addModule(content, "./" + base, camelCase(base));
-            },
-            function (error) {
-              warn("failed to read " + dir, error);
-            }
-          )
-        );
-      })
-    ).then(
-      function () {
-        return writeFile(index, generator.compile(content)).then(
-          function () {
-            log("index generated " + index);
-          },
-          function (error) {
-            warn("failed to write " + index, error);
+  const entries = yield readdir(dir);
+  const index = join(dir, "index.js");
+  try {
+    yield Promise.all(
+      entries.map(
+        asyncFn(function* (entry) {
+          if (entry === "index.js") {
+            return;
           }
-        );
+          try {
+            const stats = yield stat(join(dir, entry));
+            if (entry[0] === "." || entry[0] === "_") {
+              return;
+            }
+
+            let base;
+            if (stats.isDirectory()) {
+              base = entry;
+            } else if (
+              !(
+                stats.isFile() &&
+                ((base = removeSuffix(entry, ".coffee")) ||
+                  (base = removeSuffix(entry, ".js")))
+              )
+            ) {
+              return;
+            }
+
+            generator.addModule(content, "./" + base, camelCase(base));
+          } catch (error) {
+            warn("failed to read " + dir, error);
+          }
+        })
+      )
+    );
+    yield writeFile(index, generator.compile(content)).then(
+      function () {
+        log("index generated " + index);
       },
       function (error) {
-        warn("failed to generate " + index, error);
+        warn("failed to write " + index, error);
       }
     );
-  });
-}
+  } catch (error) {
+    warn("failed to generate " + index, error);
+  }
+});
 
-function findDirs(dir) {
-  return readdir(dir).then(
-    function (entries) {
-      return Promise.all(
-        entries.map(function (entry) {
+const findDirs = asyncFn(function* (dir) {
+  try {
+    const entries = yield readdir(dir);
+    return Promise.all(
+      entries.map(
+        asyncFn(function* (entry) {
           const path = join(dir, entry);
-          return stat(path).then(
-            function (stats) {
-              if (stats.isDirectory()) {
-                return findDirs(path);
-              }
-              if (entry === ".index-modules" && stats.isFile()) {
-                return indexModules(dir);
-              }
-            },
-            function (error) {
-              warn("cannot read " + entry, error);
+          try {
+            const stats = yield stat(path);
+            if (stats.isDirectory()) {
+              return findDirs(path);
             }
-          );
+            if (entry === ".index-modules" && stats.isFile()) {
+              return indexModules(dir);
+            }
+          } catch (error) {
+            warn("cannot read " + entry, error);
+          }
         })
-      );
-    },
-    function (error) {
-      warn("failed to read " + dir, error);
-    }
-  );
-}
+      )
+    );
+  } catch (error) {
+    warn("failed to read " + dir, error);
+  }
+});
 
 // ===================================================================
 
