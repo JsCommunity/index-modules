@@ -132,7 +132,7 @@ const indexModules = asyncFn(function* (dir, importExt, indexFile) {
             let identifier, path, parts;
             if (stats.isDirectory()) {
               identifier = path = entry;
-              path = entry;
+              path = join(entry, indexFile);
             } else if (
               stats.isFile() &&
               [".coffee", ".js", ".mjs"].includes((parts = parse(entry)).ext)
