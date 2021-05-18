@@ -43,18 +43,15 @@ const GENERATORS = (function () {
       },
       addModule: function (content, path, identifier) {
         content.push(
-          "import _" +
+          "import * as _" + identifier + " from " + JSON.stringify(path),
+          'if ("default" in _' +
             identifier +
-            ", * as __" +
-            identifier +
-            " from " +
-            JSON.stringify(path),
-          "properties." +
+            ") properties." +
             identifier +
             " = { enumerable: true, get: () => _" +
             identifier +
-            " }",
-          "export { __" + identifier + " as " + identifier + " }",
+            ".default }",
+          "export { _" + identifier + " as " + identifier + " }",
           ""
         );
       },
