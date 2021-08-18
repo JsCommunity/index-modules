@@ -170,7 +170,7 @@ const findDirs = asyncFn(function* (dir, ...opts) {
           try {
             const stats = yield stat(path);
             if (stats.isDirectory()) {
-              return findDirs(path);
+              return findDirs(path, ...opts);
             }
             if (entry === ".index-modules" && stats.isFile()) {
               return indexModules(dir, ...opts);
